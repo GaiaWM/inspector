@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Dark gray brand theme with green accent */
+    --background: 210 6% 15%;
+    --foreground: 0 0% 100%;
+
+    --card: 210 7% 20%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 210 6% 15%;
+    --popover-foreground: 0 0% 100%;
+
+    /* Accent green as primary */
+    --primary: 122 39% 49%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 7% 25%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 210 7% 25%;
+    --muted-foreground: 0 0% 65%;
+
+    /* Accent green */
+    --accent: 122 39% 49%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 7% 30%;
+    --input: 210 7% 25%;
+    --ring: 122 39% 49%;
+
+    --radius: 0.5rem;
+
+    /* Glow effects */
+    --glow-primary: 122 39% 49%;
+    --glow-accent: 122 39% 55%;
+
+    --sidebar-background: 210 6% 15%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 122 39% 49%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 7% 25%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 7% 30%;
+    --sidebar-ring: 122 39% 49%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
