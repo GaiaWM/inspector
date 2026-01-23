@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Eye, Compass, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,13 @@ interface InspectFormProps {
   isLoading: boolean;
 }
 
-const perspectives = [
+interface World {
+  name: string;
+  slug: string;
+  inspection_presets?: string[];
+}
+
+const defaultPerspectives = [
   "Human adult",
   "Human child",
   "Elf",
@@ -46,10 +52,40 @@ const contexts = [
 ];
 
 export function InspectForm({ onSubmit, isLoading }: InspectFormProps) {
-  const [world, setWorld] = useState("alaria");
+  const [worlds, setWorlds] = useState<World[]>([]);
+  const [worldsLoading, setWorldsLoading] = useState(true);
+  const [world, setWorld] = useState("");
   const [obj, setObj] = useState("");
   const [perspective, setPerspective] = useState("Human adult");
   const [context, setContext] = useState("generic");
+
+  const selectedWorld = worlds.find((w) => w.slug === world);
+  const perspectives = selectedWorld?.inspection_presets ?? defaultPerspectives;
+
+  useEffect(() => {
+    async function fetchWorlds() {
+      try {
+        const response = await fetch("https://api.gaia.fantasymaps.org/worlds");
+        const data = await response.json();
+        setWorlds(data);
+        if (data.length > 0 && !world) {
+          setWorld(data[0].slug);
+        }
+      } catch (error) {
+        console.error("Failed to fetch worlds:", error);
+      } finally {
+        setWorldsLoading(false);
+      }
+    }
+    fetchWorlds();
+  }, []);
+
+  // Reset perspective when world changes if current perspective isn't available
+  useEffect(() => {
+    if (perspectives.length > 0 && !perspectives.includes(perspective)) {
+      setPerspective(perspectives[0]);
+    }
+  }, [world, perspectives, perspective]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,19 +96,24 @@ export function InspectForm({ onSubmit, isLoading }: InspectFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* World Input */}
+      {/* World Select */}
       <div className="space-y-2">
-        <Label htmlFor="world" className="flex items-center gap-2 font-display text-sm tracking-wide">
+        <Label className="flex items-center gap-2 font-display text-sm tracking-wide">
           <Compass className="w-4 h-4 text-primary" />
           World
         </Label>
-        <Input
-          id="world"
-          value={world}
-          onChange={(e) => setWorld(e.target.value)}
-          placeholder="Enter world name..."
-          className="font-body text-lg"
-        />
+        <Select value={world} onValueChange={setWorld} disabled={worldsLoading}>
+          <SelectTrigger className="font-body">
+            <SelectValue placeholder={worldsLoading ? "Loading worlds..." : "Select a world"} />
+          </SelectTrigger>
+          <SelectContent>
+            {worlds.map((w) => (
+              <SelectItem key={w.slug} value={w.slug} className="font-body">
+                {w.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Object Input */}
